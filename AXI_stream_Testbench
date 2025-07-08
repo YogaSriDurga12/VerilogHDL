@@ -1,0 +1,33 @@
+/ Code your testbench here
+// or browse Examples
+module tb;
+  reg clk;
+  reg resetn;
+  reg tvalid;
+  wire [7:0]tdata;
+  wire tlast;
+  wire tready;
+  //master instantiation
+  axi_stream_master u1(.clk(clk),.resetn(resetn),.tvalid(tvalid),
+                       .tdata(tdata),.tlast(tlast),.tready(tready));
+   //slave instantiation
+   axi_stream_slave u2(.clk(clk),.resetn(resetn),.tvalid(tvalid),
+                       .tdata(tdata),.tlast(tlast),.tready(tready));
+  initial clk=0;
+  always #5 clk=~clk;
+  initial begin
+    resetn=0;#20;
+    resetn=1;
+  end
+  //handshake mechanism
+  always@(posedge clk ) begin
+    if(tvalid && tready) begin
+         $display("time %0t: Received data=%0d , tvalid=%0b , tready=%0b, tlast=%0b",$time,tdata,tvalid,tready,tlast);
+    end
+  end
+  //termination of simulation
+  initial begin
+    #400;
+    $finish;
+  end
+endmodule
